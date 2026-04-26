@@ -46,9 +46,8 @@ export default function B2BProblems() {
       </div>
 
       {/* Lanyard card is positioned absolutely above the panels */}
-      <div className="lanyard-card-container">
-        {/* We use the Canvas wrapper internally. A height of 600px gives enough room for the swing */}
-        <Lanyard position={[0, 0, 16]} gravity={[0, -40, 0]} />
+      <div className="lanyard-wrapper lanyard-anchor">
+        <Lanyard position={[0, 2, 20]} gravity={[0, -40, 0]} fov={25} />
       </div>
 
       <div className="panels">

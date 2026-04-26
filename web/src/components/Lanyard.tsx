@@ -116,8 +116,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }: BandProps) {
     type: 'dynamic' as RigidBodyProps['type'],
     canSleep: true,
     colliders: false,
-    angularDamping: 4,
-    linearDamping: 4
+    angularDamping: 8,
+    linearDamping: 8
   };
 
   const { nodes, materials } = useGLTF(cardGLB) as any;
@@ -129,12 +129,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }: BandProps) {
   const [dragged, drag] = useState<false | THREE.Vector3>(false);
   const [hovered, hover] = useState(false);
 
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 0.25]);
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 0.25]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 0.25]);
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, 1.45, 0]
+    [0, 3.2, 0]
   ]);
 
   useEffect(() => {
@@ -174,7 +174,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }: BandProps) {
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
       ang.copy(card.current.angvel());
       rot.copy(card.current.rotation());
-      card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
+      card.current.setAngvel({
+        x: ang.x - rot.x * 0.25,
+        y: ang.y - rot.y * 0.25,
+        z: ang.z - rot.z * 0.25
+      });
     }
   });
 
@@ -183,27 +187,26 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }: BandProps) {
 
   return (
     <>
-      <group position={[0, 4, 0]}>
+      <group position={[0, 4.2, 0]}>
         <RigidBody ref={fixed} {...segmentProps} type={'fixed' as RigidBodyProps['type']} />
-        <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
+        <RigidBody position={[0, -0.25, 0]} ref={j1} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
+        <RigidBody position={[0, -0.5, 0]} ref={j2} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
+        <RigidBody position={[0, -0.75, 0]} ref={j3} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
           <BallCollider args={[0.1]} />
         </RigidBody>
         <RigidBody
-          position={[2, 0, 0]}
+          position={[0, -1.2, 0]}
           ref={card}
           {...segmentProps}
           type={dragged ? ('kinematicPosition' as RigidBodyProps['type']) : ('dynamic' as RigidBodyProps['type'])}
         >
-          <CuboidCollider args={[0.8, 1.125, 0.01]} />
+          <CuboidCollider args={[1.42, 2, 0.01]} />
           <group
-            scale={2.25}
-            position={[0, -1.2, -0.05]}
+            scale={5.0}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerUp={(e: any) => {
@@ -215,17 +218,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }: BandProps) {
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
             }}
           >
-            <mesh geometry={nodes.card.geometry}>
-              <meshPhysicalMaterial
-                color="#080808"
-                roughness={0.35}
-                metalness={0.55}
-                clearcoat={0.8}
-                clearcoatRoughness={0.25}
-              />
+            {/* Invisible hit-mesh for drag physics to preserve interactivity */}
+            <mesh geometry={nodes.card.geometry} position={[0, -0.35, 0]}>
+              <meshBasicMaterial transparent opacity={0} depthWrite={false} />
             </mesh>
-            
-            <Html transform distanceFactor={0.9} position={[0, 0, 0.02]} zIndexRange={[100, 0]} pointerEvents="none">
+
+            <Html transform distanceFactor={0.9} position={[0, -0.13, 0.02]} zIndexRange={[100, 0]} pointerEvents="none">
               <div className="card-badge">
                 <div className="card-holes">
                   <div className="card-hole" />
@@ -238,10 +236,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }: BandProps) {
               </div>
             </Html>
 
-            <mesh geometry={nodes.clip.geometry}>
+            <mesh geometry={nodes.clip.geometry} position={[0, -0.55, 0]}>
               <meshStandardMaterial color="#222222" roughness={0.3} metalness={0.8} />
             </mesh>
-            <mesh geometry={nodes.clamp.geometry}>
+            <mesh geometry={nodes.clamp.geometry} position={[0, -0.55, 0]}>
               <meshStandardMaterial color="#111111" roughness={0.4} metalness={0.8} />
             </mesh>
           </group>
@@ -251,13 +249,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }: BandProps) {
         <meshLineGeometry />
         <meshLineMaterial
           args={[{ resolution: new THREE.Vector2(1000, isMobile ? 2000 : 1000) }]}
-          color="#111111"
+          color="#2f2f2f"
           depthTest={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
-          useMap={1}
-          map={texture}
-          repeat={[-4, 1]}
-          lineWidth={1}
+          lineWidth={1.5}
+          transparent={false}
+          opacity={1}
         />
       </mesh>
     </>
