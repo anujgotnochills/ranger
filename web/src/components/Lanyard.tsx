@@ -252,7 +252,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }: BandProps) {
           color="#2f2f2f"
           depthTest={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
-          lineWidth={1.5}
+          lineWidth={1.2}
           transparent={false}
           opacity={1}
         />

@@ -63,11 +63,10 @@ export default function Hero() {
         </span>
       </div>
 
-      {/* ── Bottom Footer Layer ── */}
-      <div className="absolute bottom-[18%] left-[24px] right-[24px] grid grid-cols-2 md:grid-cols-4 items-center text-[12px] md:text-[18px] font-medium uppercase text-white/90 z-[5] hero-bottom-text gap-x-12 md:gap-x-24 px-8">
+      <div className="absolute bottom-[18%] left-0 right-0 grid grid-cols-2 md:grid-cols-4 items-center text-[12px] md:text-[18px] font-medium uppercase text-white/90 z-[5] hero-bottom-text gap-y-4 md:gap-y-0 px-8 md:px-16 lg:px-24">
         <span className="text-left whitespace-nowrap">© 2026</span>
         <span className="text-right md:text-center whitespace-nowrap">AI / WEB3 / AR</span>
-        <span className="text-left md:text-center whitespace-nowrap">RANGER.TECH</span>
+        <span className="text-left md:text-center whitespace-nowrap md:ml-8 lg:ml-16">RANGER.TECH</span>
         <span className="text-right whitespace-nowrap">ECOSYSTEM DESIGN</span>
       </div>
     </section>
